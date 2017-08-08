@@ -1,15 +1,15 @@
 <%= form_for(@portfolio_item) do |f| %>
-  <div class="field">
+  <div class="form_group">
     <%= f.label :title %>
     <%= f.text_field :title %>
   </div>
 
-  <div class="field">
+  <div class="form_group">
     <%= f.label :subtitle %>
     <%= f.text_field :subtitle %>
   </div>
 
-  <div class="field">
+  <div class="form_group">
     <%= f.label :body %>
     <%= f.text_area :body %>
   </div>
@@ -23,7 +23,7 @@
     <% end %>
   </ul>
 
-  <div class="actions">
+  <div class="form_group">
     <%= f.submit %>
   </div>
 <% end %>
