@@ -1,60 +1,31 @@
 class BlogsController < ApplicationController
-  before_action :set_blog, only: [:show, :edit, :update, :destroy]
-
-  # GET /blogs
-  # GET /blogs.json
-  def index
-    @blogs = Blog.all
-  end
-
-  # GET /blogs/1
-  # GET /blogs/1.json
-  def show
-  end
-
-  # GET /blogs/new
-  def new
-    @blog = Blog.new
-  end
-
-  # GET /blogs/1/edit
-  def edit
-  end
-
-  # POST /blogs
-  # POST /blogs.json
-  def create
-    @blog = Blog.new(blog_params)
-
-    respond_to do |format|
-      if @blog.save
-        format.html { redirect_to @blog, notice: 'Sweet post yo.' }
-      else
-        format.html { render :new }
-      end
-    end
-  end
-
-  # PATCH/PUT /blogs/1
-  # PATCH/PUT /blogs/1.json
-  def update
-class BlogsController < ApplicationController
   before_action :set_blog, only: [:show, :edit, :update, :destroy, :toggle_status]
   layout "blog"
-  access all: [:show, :index], user: {except: [:destroy, :new, :create, :update, :edit]}, site_admin: :all
+  access all: [:show, :index], user: {except: [:destroy, :new, :create, :update, :edit, :toggle_status]}, site_admin: :all
 
   # GET /blogs
   # GET /blogs.json
   def index
-    @blogs = Blog.special_blogs
+    if logged_in?(:site_admin)
+      @blogs = Blog.recent.page(params[:page]).per(5)
+    else
+      @blogs = Blog.published.recent.page(params[:page]).per(5)
+    end
     @page_title = "My Portfolio Blog"
   end
 
   # GET /blogs/1
   # GET /blogs/1.json
   def show
-    @page_title = @blog.title
-    @seo_keywords = @blog.body
+    if logged_in?(:site_admin) || @blog.published?
+      @blog = Blog.includes(:comments).friendly.find(params[:id])
+      @comment = Comment.new
+
+      @page_title = @blog.title
+      @seo_keywords = @blog.body
+    else
+      redirect_to blogs_path, notice: "You are not authorized to access this page"
+    end
   end
 
   # GET /blogs/new
